@@ -8,6 +8,7 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 
 import api from "../services/api";
+import { connect, disconnect } from "../services/socket";
 import Dev from "../components/Dev";
 
 export default function Main({ navigation }) {
@@ -26,8 +27,8 @@ export default function Main({ navigation }) {
 
         const { latitude, longitude } = coords;
         setCurrentRegion({
-          latitude: -23.603988,
-          longitude: -46.6029821,
+          latitude,
+          longitude,
           latitudeDelta: 0.04,
           longitudeDelta: 0.04
         });
@@ -35,6 +36,11 @@ export default function Main({ navigation }) {
     }
     loadInitialPosition();
   }, []);
+
+  function setupWebsocket() {
+    const { latitude, longitude } = currentRegion;
+    connect(latitude, longitude, techs);
+  }
 
   async function loadDevs() {
     const { latitude, longitude } = currentRegion;
@@ -48,6 +54,7 @@ export default function Main({ navigation }) {
     });
 
     setDevs(response.data.devs);
+    setupWebsocket();
   }
 
   function handleRegionChanged(region) {
